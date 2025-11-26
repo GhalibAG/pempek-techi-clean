@@ -18,8 +18,6 @@ class ProductResource extends Resource
 
     protected static ?string $navigationLabel = 'Kelola Produk';
 
-
-
     public static function form(Form $form): Form
     {
         return $form
@@ -97,6 +95,8 @@ class ProductResource extends Resource
                     ->label('Stok')
                     ->icon('heroicon-o-circle-stack')
                     ->color('warning')
+                     // IZIN KHUSUS: Admin dan Owner BOLEH akses ini
+                    ->visible(fn (): bool => auth()->user()->role === 'admin' || auth()->user()->role === 'owner')
                     ->form([
                         Forms\Components\TextInput::make('quantity')
                             ->label('Stok Baru')
@@ -108,6 +108,12 @@ class ProductResource extends Resource
                             ['product_id' => $record->id],
                             ['quantity' => $data['quantity']]
                         );
+
+                        // Kirim notifikasi sukses
+                        \Filament\Notifications\Notification::make()
+                            ->title('Stok berhasil diupdate')
+                            ->success()
+                            ->send();
                     })
                     ->modalWidth('sm'),
                 // ---------------------------

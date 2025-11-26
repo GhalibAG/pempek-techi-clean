@@ -11,7 +11,7 @@ class LatestTransactions extends BaseWidget
 {
     protected static ?string $heading = '5 Transaksi Terakhir';
 
-    protected static ?int $sort = 3;
+    protected static ?int $sort = 4;
 
     protected int|string|array $columnSpan = 'full'; // Agar tabel ini lebar penuh
 

@@ -6,6 +6,7 @@ use App\Filament\Pages\FinancialReport;
 use App\Filament\Widgets\ExpensesChart;
 use App\Filament\Widgets\LatestTransactions;
 use App\Filament\Widgets\LowStockAlert;
+use App\Filament\Widgets\ProfitLossChart;
 use App\Filament\Widgets\StatsOverview;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -15,7 +16,6 @@ use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -33,8 +33,13 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Red,
             ])
+            ->renderHook(
+                'panels::sidebar.footer',
+                fn () => view('filament.custom-sidebar-footer')
+            )
+
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -42,10 +47,12 @@ class AdminPanelProvider extends PanelProvider
                 FinancialReport::class,
 
             ])
+
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class, // Widget default akun
-                StatsOverview::class,       // <-- Widget kita (Angka)
+                // Widget default akun
+                StatsOverview::class,
+                ProfitLossChart::class,     // <-- Widget kita (Angka)
                 LowStockAlert::class,
                 ExpensesChart::class,       // <-- Widget kita (Grafik)
                 LatestTransactions::class,  // <-- Widget kita (Tabel)
@@ -64,5 +71,6 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ]);
+
     }
 }
