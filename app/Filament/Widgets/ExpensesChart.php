@@ -15,6 +15,12 @@ class ExpensesChart extends ChartWidget
 
     protected int|string|array $columnSpan = 1;
 
+    public static function canView(): bool
+    {
+        // Hanya izinkan Owner melihat data keuangan sensitif
+        return auth()->user()->role === 'owner';
+    }
+
     protected function getData(): array
     {
         $data = Expense::selectRaw('description, sum(amount) as total')

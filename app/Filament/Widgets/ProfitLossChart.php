@@ -43,4 +43,10 @@ class ProfitLossChart extends ChartWidget
     {
         return 'bar'; // Tipe Chart: Bar/Histogram
     }
+
+    public static function canView(): bool
+    {
+        // Hanya izinkan Owner melihat data keuangan sensitif
+        return auth()->user()->role === 'owner';
+    }
 }

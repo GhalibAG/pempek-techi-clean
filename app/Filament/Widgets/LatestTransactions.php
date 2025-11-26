@@ -40,4 +40,10 @@ class LatestTransactions extends BaseWidget
                     ->label('Kasir'),
             ]);
     }
+
+    public static function canView(): bool
+    {
+        // Hanya izinkan Owner melihat data keuangan sensitif
+        return auth()->user()->role === 'owner';
+    }
 }

@@ -25,6 +25,12 @@ class FinancialReport extends Page implements HasForms
 
     protected static string $view = 'filament.pages.financial-report';
 
+    public static function canAccess(): bool
+    {
+        // HANYA Owner yang boleh melihat laporan ini
+        return auth()->user()->role === 'owner';
+    }
+
     // --- PERBAIKAN DISINI: Gunakan array $data untuk menampung form ---
     public ?array $data = [];
 

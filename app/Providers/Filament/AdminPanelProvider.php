@@ -35,27 +35,56 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Red,
             ])
+
             ->renderHook(
                 'panels::sidebar.footer',
                 fn () => view('filament.custom-sidebar-footer')
             )
+
+            // 1. HOOK UNTUK TOMBOL LOGOUT DI BAWAH SIDEBAR
+            ->renderHook(
+                'panels::head.end',
+                fn () => '<style>
+                    /* 1. SIDEBAR: Paksa Putih (Clean Look) */
+                    aside.fi-sidebar {
+                        background-color: #ffffff !important; 
+                        border-right: 1px solid #e5e7eb !important;
+                    }
+
+                    /* 2. LATAR UTAMA: Abu Kalem (Gray-100) */
+                    .fi-layout, main, .fi-page-content {
+                        background-color: #f3f4f6 !important;
+                    }
+
+                    /* 3. Menu AKTIF: Highlight Abu Tipis dengan Teks Merah */
+                    .fi-sidebar-item-button[aria-current="page"] {
+                        background-color: #e5e7eb !important; /* Gray-200 */
+                        color: var(--primary-600) !important; /* Ambil warna Red Primary */
+                    }
+
+                    /* 4. Teks & Header Sidebar */
+                    .fi-sidebar-header {
+                        background-color: #ffffff !important;
+                        border-bottom: 1px solid #e5e7eb;
+                    }
+                </style>'
+            )
+
+            // 2. HOOK UNTUK DESIGN CSS (SIDEBAR MERAH LEMBUT)
 
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Pages\Dashboard::class,
                 FinancialReport::class,
-
             ])
-
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                // Widget default akun
-                StatsOverview::class,
-                ProfitLossChart::class,     // <-- Widget kita (Angka)
+                // StatsOverview::class, // (Opsional: Matikan ini kalau double sama dashboard)
+                ProfitLossChart::class,
                 LowStockAlert::class,
-                ExpensesChart::class,       // <-- Widget kita (Grafik)
-                LatestTransactions::class,  // <-- Widget kita (Tabel)
+                ExpensesChart::class,
+                LatestTransactions::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -71,6 +100,5 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ]);
-
     }
 }
