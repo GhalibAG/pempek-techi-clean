@@ -2,47 +2,42 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Filament\Models\Contracts\FilamentUser; // <-- PENTING
+use Filament\Panel; // <-- PENTING
 
-class User extends Authenticatable
+// Tambahkan "implements FilamentUser" di sini
+class User extends Authenticatable implements FilamentUser
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'email',
         'password',
+        'role',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // --- FUNGSI IZIN MASUK FILAMENT (WAJIB ADA DI PRODUCTION) ---
+    public function canAccessPanel(Panel $panel): bool
+    {
+        // Izinkan masuk jika role adalah 'admin' atau 'owner'
+        // Atau kembalikan 'true' jika ingin mengizinkan semua user login (untuk testing)
+        return $this->role === 'admin' || $this->role === 'owner';
     }
 }

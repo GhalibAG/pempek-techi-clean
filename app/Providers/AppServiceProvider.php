@@ -2,7 +2,8 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\ServiceProvider; // <-- Tambahkan Import Ini
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +20,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // --- PAKSA HTTPS DI PRODUCTION ---
+        if ($this->app->environment('production')) {
+            URL::forceScheme('https');
+        }
     }
 }
