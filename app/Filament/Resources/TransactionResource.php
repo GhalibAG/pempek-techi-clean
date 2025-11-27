@@ -133,12 +133,14 @@ class TransactionResource extends Resource
                 Tables\Columns\TextColumn::make('items')
                     ->label('Item Dibeli')
                     ->formatStateUsing(function ($record) {
-                        // Kita loop item-nya biar tampil "Qty x Nama Produk"
                         return $record->items->map(function ($item) {
-                            return "{$item->quantity}x {$item->product->name}";
-                        })->join('<br>'); // Pisahkan dengan baris baru
+                            // Cek apakah produk masih ada?
+                            $productName = $item->product?->name ?? 'Produk Terhapus';
+
+                            return "{$item->quantity}x {$productName}";
+                        })->join('<br>');
                     })
-                    ->html() // Izinkan kode HTML (<br>)
+                    ->html()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('total_amount')
                     ->label('Total Nota')
