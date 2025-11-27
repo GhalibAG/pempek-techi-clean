@@ -12,6 +12,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Pages\Page;
+use Maatwebsite\Excel\Facades\Excel;
 
 class FinancialReport extends Page implements HasForms
 {
@@ -182,47 +183,13 @@ class FinancialReport extends Page implements HasForms
 
     public function exportExcel()
     {
-        // 1. Pastikan data terbaru sudah ter-load
+        // 1. Pastikan data terbaru ter-filter
         $this->filter();
-        $data = $this->reportData;
 
-        // 2. Nama File Keren
-        $fileName = 'Laporan-Keuangan-'.now()->format('d-M-Y_H-i').'.csv';
-
-        // 3. Header Browser (biar otomatis download)
-        $headers = [
-            'Content-type' => 'text/csv',
-            'Content-Disposition' => "attachment; filename=$fileName",
-            'Pragma' => 'no-cache',
-            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
-            'Expires' => '0',
-        ];
-
-        // 4. Proses Penulisan Data
-        $callback = function () use ($data) {
-            $file = fopen('php://output', 'w');
-
-            // Trik Ajaib: Tambahkan BOM agar Excel bisa baca simbol Rupiah/UTF-8 dengan benar
-            fwrite($file, "\xEF\xBB\xBF");
-
-            // Tulis Judul Kolom (Header)
-            fputcsv($file, ['TANGGAL', 'KETERANGAN', 'JENIS', 'NOMINAL (Rp)', 'PIC']);
-
-            // Tulis Isi Data
-            foreach ($data as $row) {
-                fputcsv($file, [
-                    \Carbon\Carbon::parse($row['date'])->format('d/m/Y H:i'), // Format Tanggal
-                    $row['description'],
-                    $row['type'] === 'income' ? 'PEMASUKAN' : 'PENGELUARAN', // Huruf Besar biar tegas
-                    $row['amount'], // Angka murni biar bisa di-sum di Excel
-                    $row['user'],
-                ]);
-            }
-
-            fclose($file);
-        };
-
-        // 5. Download!
-        return response()->stream($callback, 200, $headers);
+        // 2. Download pakai Library Laravel Excel
+        return Excel::download(
+            new FinancialExport($this->reportData),
+            'Laporan-Keuangan-'.now()->format('d-M-Y').'.xlsx'
+        );
     }
 }
