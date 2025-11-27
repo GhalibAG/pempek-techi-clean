@@ -37,6 +37,10 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Red,
             ])
 
+            ->brandName(false) // Ini mematikan tulisan "Laravel"
+            ->brandLogo(fn () => view('filament.logo')) // Ini memanggil logo kamu
+            ->brandLogoHeight('3rem')
+
             ->renderHook(
                 'panels::sidebar.footer',
                 fn () => view('filament.custom-sidebar-footer')
