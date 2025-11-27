@@ -32,6 +32,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->darkMode(false)
             ->colors([
                 'primary' => Color::Red,
             ])
@@ -45,22 +46,24 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(
                 'panels::head.end',
                 fn () => '<style>
-                    /* 1. SIDEBAR: Paksa Putih (Clean Look) */
-                    aside.fi-sidebar {
-                        background-color: #ffffff !important; 
-                        border-right: 1px solid #e5e7eb !important;
+                   .fi-section, .fi-widget, .fi-ta {
+                        background-color: #ffffff !important;
+                        border-radius: 0.75rem !important; /* Sudut membulat */
+                        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1) !important; /* Shadow tipis */
+                        border: 1px solid #e5e7eb !important; /* Border abu tipis */
                     }
 
-                    /* 2. LATAR UTAMA: Abu Kalem (Gray-100) */
-                    .fi-layout, main, .fi-page-content {
-                        background-color: #f3f4f6 !important;
+                    /* 2. Header Widget (Judul) lebih tegas */
+                    .fi-section-header-heading, .fi-widget-header-heading {
+                        font-weight: 700 !important;
+                        color: #111827 !important; /* Hitam pekat */
                     }
 
-                    /* 3. Menu AKTIF: Highlight Abu Tipis dengan Teks Merah */
-                    .fi-sidebar-item-button[aria-current="page"] {
-                        background-color: #e5e7eb !important; /* Gray-200 */
-                        color: var(--primary-600) !important; /* Ambil warna Red Primary */
+                    /* 3. Berikan jarak antar widget */
+                   .fi-widget {
+                     border-top: 4px solid var(--primary-500) !important; /* Garis Merah di atas */
                     }
+                    
 
                     /* 4. Teks & Header Sidebar */
                     .fi-sidebar-header {

@@ -54,31 +54,60 @@ class FinancialReport extends Page implements HasForms
         return $form
             ->schema([
                 Section::make('Filter Laporan')
-                    ->columns(3)
+                    ->columns(4) // Jadi 4 kolom biar muat
                     ->schema([
                         DatePicker::make('startDate')
                             ->label('Dari Tanggal')
                             ->required(),
+
                         DatePicker::make('endDate')
                             ->label('Sampai Tanggal')
                             ->required(),
+
+                        // --- FILTER BARU ---
+                        \Filament\Forms\Components\Select::make('type')
+                            ->label('Jenis')
+                            ->options([
+                                'all' => 'Semua',
+                                'income' => 'Pemasukan',
+                                'expense' => 'Pengeluaran',
+                            ])
+                            ->default('all'),
+
+                        \Filament\Forms\Components\TextInput::make('search')
+                            ->label('Cari Keterangan')
+                            ->placeholder('Contoh: Gojek, Ikan...'),
+                        // -------------------
                     ]),
             ])
-            ->statePath('data'); // Form akan disimpan ke variabel $data
+            ->statePath('data');
     }
 
     public function filter(): void
     {
-        // Ambil data dari form state ($this->data)
         $state = $this->form->getState();
         $start = $state['startDate'];
         $end = $state['endDate'];
+        $type = $state['type'] ?? 'all'; // Ambil jenis
+        $search = $state['search'] ?? null; // Ambil kata kunci
 
-        // 1. Ambil Pemasukan (Transaksi)
-        $incomes = Transaction::whereBetween('created_at', [$start.' 00:00:00', $end.' 23:59:59'])
-            ->with('user')
-            ->get()
-            ->map(function ($item) {
+        $results = collect();
+
+        // 1. Ambil Pemasukan (Jika filter 'all' atau 'income')
+        if ($type === 'all' || $type === 'income') {
+            $query = Transaction::whereBetween('created_at', [$start.' 00:00:00', $end.' 23:59:59'])
+                ->with('user');
+
+            // Filter Pencarian (Search)
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('source_type', 'like', "%$search%")
+                        ->orWhere('location_notes', 'like', "%$search%")
+                        ->orWhere('general_notes', 'like', "%$search%");
+                });
+            }
+
+            $incomes = $query->get()->map(function ($item) {
                 return [
                     'date' => $item->created_at->format('Y-m-d H:i:s'),
                     'description' => 'Penjualan (Nota #'.$item->id.') - '.$item->source_type,
@@ -87,25 +116,32 @@ class FinancialReport extends Page implements HasForms
                     'user' => $item->user->name ?? 'System',
                 ];
             });
+            $results = $results->merge($incomes);
+        }
 
-        // 2. Ambil Pengeluaran
-        $expenses = Expense::whereBetween('date', [$start, $end])
-            ->get()
-            ->map(function ($item) {
+        // 2. Ambil Pengeluaran (Jika filter 'all' atau 'expense')
+        if ($type === 'all' || $type === 'expense') {
+            $query = Expense::whereBetween('date', [$start, $end]);
+
+            // Filter Pencarian
+            if ($search) {
+                $query->where('description', 'like', "%$search%");
+            }
+
+            $expenses = $query->get()->map(function ($item) {
                 return [
-                    'date' => $item->date,
+                    'date' => $item->date, // Pastikan ini format Y-m-d H:i:s jika perlu sorting
                     'description' => $item->description,
                     'type' => 'expense',
                     'amount' => $item->amount,
                     'user' => 'Admin',
                 ];
             });
+            $results = $results->merge($expenses);
+        }
 
-        // 3. Gabung dan Urutkan
-        $this->reportData = $incomes->merge($expenses)
-            ->sortByDesc('date')
-            ->values()
-            ->all();
+        // 3. Gabung & Urutkan
+        $this->reportData = $results->sortByDesc('date')->values()->all();
     }
 
     protected function getHeaderActions(): array
