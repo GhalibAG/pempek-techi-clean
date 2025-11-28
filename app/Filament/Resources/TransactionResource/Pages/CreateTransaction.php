@@ -3,21 +3,46 @@
 namespace App\Filament\Resources\TransactionResource\Pages;
 
 use App\Filament\Resources\TransactionResource;
-use App\Models\Stock;
+use App\Models\Product;
+use App\Models\Stock; // Tambahkan ini
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Auth; // <-- PENTING
 
 class CreateTransaction extends CreateRecord
 {
     protected static string $resource = TransactionResource::class;
 
-    // Kita HAPUS mutateFormDataBeforeCreate karena total_amount
-    // sudah dikirim otomatis dari Form yang kita buat di atas.
-
-    // Tapi kita tetap butuh mengisi User ID kasir
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['user_id'] = Auth::id();
+
+        // --- VALIDASI STOK KRITIS ---
+        if (isset($data['items']) && is_array($data['items'])) {
+            foreach ($data['items'] as $item) {
+                $product = Product::find($item['product_id']);
+                $requestedQuantity = (int) ($item['quantity'] ?? 0);
+
+                // Ambil stok saat ini (pastikan relasi stock ada)
+                $currentStock = $product->stock->quantity ?? 0;
+
+                // Cek: Jika stok saat ini KURANG dari jumlah yang diminta
+                if ($currentStock < $requestedQuantity) {
+
+                    // Batalkan transaksi dan kirim notifikasi error
+                    Notification::make()
+                        ->title('Stok Tidak Mencukupi!')
+                        ->body("Stok untuk {$product->name} tersisa $currentStock pcs. Transaksi dibatalkan.")
+                        ->danger()
+                        ->persistent()
+                        ->send();
+
+                    // Menghentikan proses penyimpanan
+                    throw new \Exception("Stok tidak cukup untuk {$product->name}.");
+                }
+            }
+        }
+        // --- AKHIR VALIDASI ---
 
         return $data;
     }
