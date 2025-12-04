@@ -4,6 +4,7 @@ namespace App\Filament\Widgets;
 
 // <-- PENTING
 use App\Models\Product;
+use App\Models\Stock;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Tables\Table;
