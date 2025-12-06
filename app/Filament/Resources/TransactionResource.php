@@ -13,6 +13,7 @@ use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class TransactionResource extends Resource
 {
@@ -141,7 +142,11 @@ class TransactionResource extends Resource
                         })->join('<br>');
                     })
                     ->html()
-                    ->searchable(),
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->whereHas('items.product', function (Builder $q) use ($search) {
+                            $q->where('name', 'like', "%{$search}%");
+                        });
+                    }),
                 Tables\Columns\TextColumn::make('total_amount')
                     ->label('Total Nota')
                     ->money('IDR', 0)
