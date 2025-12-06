@@ -30,6 +30,7 @@ class ProductResource extends Resource
                 Forms\Components\TextInput::make('price')
                     ->required()
                     ->numeric()
+                    ->minValue(0)
                     ->prefix('Rp')
                     ->label('Harga Jual'),
 
@@ -37,6 +38,7 @@ class ProductResource extends Resource
                 Forms\Components\TextInput::make('cost_price')
                     ->required()
                     ->numeric()
+                    ->minValue(0)
                     ->prefix('Rp')
                     ->label('Harga Modal (HPP)'),
 
@@ -95,6 +97,7 @@ class ProductResource extends Resource
                     ->label('Stok')
                     ->icon('heroicon-o-circle-stack')
                     ->color('warning')
+                    ->visible(fn (): bool => auth()->user()->role === 'owner')
                      // IZIN KHUSUS: Admin dan Owner BOLEH akses ini
                     ->visible(fn (): bool => auth()->user()->role === 'admin' || auth()->user()->role === 'owner')
                     ->form([

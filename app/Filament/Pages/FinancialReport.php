@@ -30,7 +30,7 @@ class FinancialReport extends Page implements HasForms
     public static function canAccess(): bool
     {
         // HANYA Owner yang boleh melihat laporan ini
-        return auth()->user()->role === 'owner';
+        return auth()->user()->role === 'admin' || auth()->user()->role === 'owner';
     }
 
     // --- PERBAIKAN DISINI: Gunakan array $data untuk menampung form ---

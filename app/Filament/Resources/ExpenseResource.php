@@ -35,6 +35,7 @@ class ExpenseResource extends Resource
                 Forms\Components\TextInput::make('amount')
                     ->required()
                     ->numeric()
+                    ->minValue(0)
                     ->prefix('Rp')
                     ->label('Jumlah Pengeluaran'),
             ]);
