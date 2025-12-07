@@ -44,7 +44,7 @@ class LowStockAlert extends BaseWidget
                     ->icon('heroicon-o-circle-stack')
                     ->color('warning')
                     // IZIN KHUSUS: Admin dan Owner BOLEH
-                    ->visible(fn (): bool => auth()->user()->role === 'admin' || auth()->user()->role === 'owner')
+                    ->visible(fn (): bool => auth()->user()->role === 'owner')
                     ->form([
                         Forms\Components\TextInput::make('quantity')
                             ->label('Stok Baru')
