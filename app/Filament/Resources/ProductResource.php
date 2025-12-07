@@ -97,9 +97,12 @@ class ProductResource extends Resource
                     ->label('Stok')
                     ->icon('heroicon-o-circle-stack')
                     ->color('warning')
+
+                    // --- PERBAIKAN DI SINI ---
+                    // Hapus baris visible yang kedua. Sisakan yang ini saja:
                     ->visible(fn (): bool => auth()->user()->role === 'owner')
-                     // IZIN KHUSUS: Admin dan Owner BOLEH akses ini
-                    ->visible(fn (): bool => auth()->user()->role === 'admin' || auth()->user()->role === 'owner')
+                    // -------------------------
+
                     ->form([
                         Forms\Components\TextInput::make('quantity')
                             ->label('Stok Baru')
@@ -112,7 +115,6 @@ class ProductResource extends Resource
                             ['quantity' => $data['quantity']]
                         );
 
-                        // Kirim notifikasi sukses
                         \Filament\Notifications\Notification::make()
                             ->title('Stok berhasil diupdate')
                             ->success()
