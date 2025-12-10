@@ -17,6 +17,7 @@ class Transaction extends Model
         'source_type',
         'location_notes',
         'general_notes',
+        'created_at'
     ];
 
     public function user(): BelongsTo

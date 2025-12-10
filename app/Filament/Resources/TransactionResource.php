@@ -78,6 +78,13 @@ class TransactionResource extends Resource
                             ->dehydrated()
                             ->extraInputAttributes(['style' => 'font-size: 1.5rem; font-weight: bold; color: green;']),
 
+                        Forms\Components\DateTimePicker::make('created_at')
+                            ->label('Tanggal Transaksi')
+                            ->default(now()) // Default ke jam sekarang
+                            ->required()
+                            ->maxDate(now()), // Opsional: Biar ga bisa isi tanggal masa depan
+                        // ------------------------------
+
                         Forms\Components\Select::make('source_type')
                             ->options([
                                 'OFFLINE' => 'Dine In / Langsung',
@@ -167,6 +174,9 @@ class TransactionResource extends Resource
                     ->color('info')
                     ->icon('heroicon-o-eye'),
 
+                Tables\Actions\EditAction::make()
+                    ->color('primary'), // Warna biru standar
+
                 // --- TOMBOL CETAK PDF ---
                 Tables\Actions\Action::make('cetak_pdf')
                     ->label('Cetak PDF')
@@ -197,7 +207,7 @@ class TransactionResource extends Resource
         return [
             'index' => Pages\ListTransactions::route('/'),
             'create' => Pages\CreateTransaction::route('/create'),
-            // 'edit' => Pages\EditTransaction::route('/{record}/edit'),
+            'edit' => Pages\EditTransaction::route('/{record}/edit'),
         ];
     }
 }
