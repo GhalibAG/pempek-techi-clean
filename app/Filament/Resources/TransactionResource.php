@@ -175,7 +175,9 @@ class TransactionResource extends Resource
                     ->icon('heroicon-o-eye'),
 
                 Tables\Actions\EditAction::make()
-                    ->color('primary'), // Warna biru standar
+                    ->color('primary')
+                    // TAMBAHKAN BARIS INI:
+                    ->visible(fn (): bool => auth()->user()->role === 'owner'),
 
                 // --- TOMBOL CETAK PDF ---
                 Tables\Actions\Action::make('cetak_pdf')
