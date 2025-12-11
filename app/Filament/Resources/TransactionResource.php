@@ -174,10 +174,10 @@ class TransactionResource extends Resource
                     ->color('info')
                     ->icon('heroicon-o-eye'),
 
-                Tables\Actions\EditAction::make()
-                    ->color('primary')
-                    // TAMBAHKAN BARIS INI:
-                    ->visible(fn (): bool => auth()->user()->role === 'owner'),
+                // Tables\Actions\EditAction::make()
+                //     ->color('primary')
+                //     // TAMBAHKAN BARIS INI:
+                //     ->visible(fn (): bool => auth()->user()->role === 'owner'),
 
                 // --- TOMBOL CETAK PDF ---
                 Tables\Actions\Action::make('cetak_pdf')
@@ -209,7 +209,7 @@ class TransactionResource extends Resource
         return [
             'index' => Pages\ListTransactions::route('/'),
             'create' => Pages\CreateTransaction::route('/create'),
-            'edit' => Pages\EditTransaction::route('/{record}/edit'),
+            // 'edit' => Pages\EditTransaction::route('/{record}/edit'),
         ];
     }
 }
